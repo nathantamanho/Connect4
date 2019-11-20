@@ -1,0 +1,52 @@
+﻿@model Jogo
+
+@using Microsoft.AspNetCore.Identity
+
+@inject UserManager<ApplicationUser> UserManager
+
+@{
+    ViewData["Title"] = "Lobby";
+}
+
+<h2>Lobby</h2>
+
+<span>Jogador 1:</span>
+@if (Model.Jogador1 == null)
+{
+    <span>ESPERANDO O ADVERSÁRIO</span>
+}
+else
+{
+    if (Model.Jogador1 is JogadorPessoa)
+    {
+    <span>(Pessoa)</span>
+    }
+    else if (Model.Jogador1 is JogadorComputador)
+    {
+        <span>(Computador)</span>
+    }
+}
+<span>Jogador 2:</span>
+@if (Model.Jogador2 == null)
+{
+    <span>ESPERANDO O ADVERSÁRIO</span>
+}
+else
+{
+    if (Model.Jogador2 is JogadorPessoa)
+    {
+    <span>(Pessoa)</span>
+    }
+    else if (Model.Jogador2 is JogadorComputador)
+    {
+        <span>(Computador)</span>
+    }
+}
+@if (Model.Jogador1Id != null && Model.Jogador2Id != null)
+{
+    //É utilizado jogador1Id para evitar problemas caso o controller
+    //não tenha incluído (include) explicitamente a propriedade Jogador
+<a asp-area="" asp-controller="Jogo"
+   asp-action="Tabuleiro"
+   asp-route-id="@Model.Id">Iniciar Jogo</a>
+}

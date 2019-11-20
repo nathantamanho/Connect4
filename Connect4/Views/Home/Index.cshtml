@@ -1,0 +1,16 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+@using Microsoft.AspNetCore.Identity
+
+@inject SignInManager<ApplicationUser> SignInManager
+
+<div><h1>Connect - 4</h1></div>
+@if (SignInManager.IsSignedIn(User))
+{
+    <a asp-area="" 
+       asp-controller="Jogo" 
+       asp-action="CriarJogo">Criar Jogo</a>
+}
+
