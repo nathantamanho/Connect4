@@ -183,8 +183,8 @@ namespace Connect4.Models
                     return;
                 }
             } while (++linha < RepresentacaoTabuleiro.GetLength(1));
-            throw new ArgumentException(
-                $"A coluna {Posicao} está lotada.");
+            //throw new ArgumentException(
+            //    $"A coluna {Posicao} está lotada.");
             
         }
 

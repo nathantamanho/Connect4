@@ -10,5 +10,13 @@ namespace Connect4.Models
         public String URLServico { get; set; }
 
         public String NomeComputador { get; set; }
+
+        public override string Nome
+        {
+            get
+            {
+                return "(Computador)" + NomeComputador;
+            }
+        }
     }
 }

@@ -5,6 +5,15 @@
 h1 {
     margin-bottom: 60px;
 }
+div.Turno {
+    border: 5px solid darkblue;
+}
+
+//Esta classe será utilizada para evitar cliques quando estiver enviando a jogada.
+div.disabled {
+    pointer-events: none;
+    opacity: 0.9;
+}
 
 div.tabuleiro {
     margin: 0 auto 30px auto;

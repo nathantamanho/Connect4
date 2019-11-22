@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace Connect4.Controllers
@@ -58,7 +59,23 @@ namespace Connect4.Controllers
         [Authorize]
         public Tabuleiro ObterJogo(int id)
         {
-            return _context.Tabuleiros.Find(id);
+            var jogo = _context.Jogos
+                .Include(j => j.Tabuleiro)
+                .Where(j => j.Id == id)
+                .FirstOrDefault();
+
+            if (jogo == null)
+            {
+                throw new ApplicationException("Não Existe o Jogo");
+            }
+            //TODO: Verificar Permissão antes.
+            if (jogo.Tabuleiro != null)
+            {                
+                return jogo.Tabuleiro;
+            }
+            jogo.Tabuleiro = new Tabuleiro();
+            _context.SaveChanges();
+            return jogo.Tabuleiro;
         }
 
         [HttpPost(Name = "Vencedor")]
@@ -70,15 +87,29 @@ namespace Connect4.Controllers
 
         [HttpPost(Name = "Jogar")]
         [Route("Jogar")]
-        //(...)/Jogar?Jogador=1&Pos=4
-        public IActionResult Jogar([FromBody] Tabuleiro t, 
-            [FromQuery]int Jogador, 
+        //(...)/Jogar?JogoId=1&Pos=4
+        public IActionResult Jogar([FromQuery] int JogoId, 
             [FromQuery]int Pos)
         {
-            t.Jogar(Jogador, Pos);
-            _context.Attach(t);
+            var jogo = _context.Jogos
+                .Include(j => j.Tabuleiro)
+                .Where(j => j.Id == JogoId)
+                .FirstOrDefault();
+            if(jogo == null)
+            {
+                return NotFound();
+            }
+            if(jogo.Tabuleiro == null)
+            {
+                return BadRequest();
+            }
+            //TODO: Pegar o usuário autenticado. 
+            //Verificar se ele é o jogador 1 ou 2.
+            //Verificar se ele pode fazer a jogada.
+            //Por último executar a jogada ou exceção.
+            jogo.Tabuleiro.Jogar(jogo.Tabuleiro.Turno, Pos);
             _context.SaveChanges();
-            return Ok(t);
+            return Ok(jogo.Tabuleiro);
         }
     }
 }

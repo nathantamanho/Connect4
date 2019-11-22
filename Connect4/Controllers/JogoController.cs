@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Connect4.Data;
 using Connect4.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -60,6 +61,7 @@ namespace Connect4.Controllers
             return View(jogo);
         }
 
+        [Authorize]
         public IActionResult Lobby(int id)
         {
             var jogo = _context.Jogos
@@ -68,9 +70,31 @@ namespace Connect4.Controllers
                 .Where(j => j.Id == id)
                 .Select(j => j)
                 .FirstOrDefault();
-            if(jogo == null)
+
+            if (jogo == null)
             {
                 return NotFound();
+            }
+
+            if (jogo.Jogador1 is JogadorPessoa)
+            {
+                jogo.Jogador1 = _context.JogadorPessoas
+                                .Include(j => j.Usuario)
+                                .Where(j => j.Id == jogo.Jogador1Id)
+                                .FirstOrDefault();
+            }
+            if (jogo.Jogador2 is JogadorPessoa)
+            {
+                jogo.Jogador2 = _context.JogadorPessoas
+                                .Include(j => j.Usuario)
+                                .Where(j => j.Id == jogo.Jogador2Id)
+                                .FirstOrDefault();
+            }
+            int? jogadorId =
+            _userManager.GetUserAsync(User).Result.JogadorId;
+            if(!(jogadorId == jogo.Jogador1Id || 
+                jogadorId == jogo.Jogador2Id)){
+                return Forbid();
             }
             return View(jogo);
         }
@@ -100,7 +124,9 @@ namespace Connect4.Controllers
             jogo = (from item in _context.Jogos.Include(j=> j.Jogador1)
                                                .Include(j => j.Jogador2)
                     where (item.Jogador1 == null ||
-                         item.Jogador2 == null)
+                         item.Jogador2 == null) &&
+                         (item.Jogador1 != jogadorAtual &&
+                         item.Jogador2!= jogadorAtual)
                     select item).FirstOrDefault();
             if (jogo != null) {
                 if (jogo.Jogador1 == null)
