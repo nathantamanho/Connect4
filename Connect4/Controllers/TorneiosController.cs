@@ -62,7 +62,49 @@ namespace Connect4.Controllers
             if (ModelState.IsValid)
             {
                 torneio.Dono = User.Identity.Name;
-                _context.Add(torneio);
+                _context.Add (torneio);
+                torneio.Jogadores = new List<Jogador> ();
+                torneio.Jogos = new List<Jogo> ();
+                //
+                // CRIANDO JOGADORES
+                //
+                // NÃO SEI COMO LINKAR JOGADORES JÁ CADASTRADOS...PERGUNTAR PARA O PROFESSOR
+                List<Jogador> jogadores = new List<Jogador> ();
+                for (int i = 1; i <= torneio.QuantidadeJogadores; i++)
+                {
+                    JogadorPessoa jogadorPessoa = new JogadorPessoa ();
+                    jogadores.Add (jogadorPessoa);
+                    torneio.Jogadores.Add (jogadorPessoa);
+                    _context.JogadorPessoas.Add (jogadorPessoa);
+                }
+                _context.SaveChanges ();
+                //
+                // CRIANDO JOGOS
+                //
+                for (int i = 1; i <= 2; i++)
+                {
+                    List<Jogo> jogos = new List<Jogo> ();
+                    for (int j1 = 0; j1 < jogadores.Count - 1; j1++)
+                    {
+                        for (int j2 = j1 + 1; j2 < jogadores.Count; j2++)
+                        {
+                            Jogo jogo = new Jogo ()
+                            {
+                                Jogador1 = jogadores[j1],
+                                Jogador2 = jogadores[j2],
+                                Tabuleiro = new Tabuleiro ()
+                            };
+                            jogos.Add (jogo);
+                        }
+                    }
+                    Random random = new Random ();
+                    while (jogos.Count > 0)
+                    {
+                        int valorAleatorio = random.Next (jogos.Count);
+                        torneio.Jogos.Add (jogos[valorAleatorio]);
+                        jogos.RemoveAt (valorAleatorio);
+                    }
+                }
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }

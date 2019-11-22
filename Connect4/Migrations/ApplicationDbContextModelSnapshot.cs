@@ -9,13 +9,12 @@ using Microsoft.EntityFrameworkCore.Storage.Internal;
 using Microsoft.EntityFrameworkCore.ValueGeneration;
 using System;
 
-namespace Connect4.Data.Migrations
+namespace Connect4.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20191113143639_TabuleiroJogo")]
-    partial class TabuleiroJogo
+    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
     {
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -37,9 +36,13 @@ namespace Connect4.Data.Migrations
 
                     b.Property<bool>("EmailConfirmed");
 
+                    b.Property<int?>("JogadorId");
+
                     b.Property<bool>("LockoutEnabled");
 
                     b.Property<DateTimeOffset?>("LockoutEnd");
+
+                    b.Property<DateTime>("Nascimento");
 
                     b.Property<string>("Nome");
 
@@ -62,9 +65,11 @@ namespace Connect4.Data.Migrations
                     b.Property<string>("UserName")
                         .HasMaxLength(256);
 
-                    b.Property<int?>("jogadorId");
-
                     b.HasKey("Id");
+
+                    b.HasIndex("JogadorId")
+                        .IsUnique()
+                        .HasFilter("[JogadorId] IS NOT NULL");
 
                     b.HasIndex("NormalizedEmail")
                         .HasName("EmailIndex");
@@ -73,8 +78,6 @@ namespace Connect4.Data.Migrations
                         .IsUnique()
                         .HasName("UserNameIndex")
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
-
-                    b.HasIndex("jogadorId");
 
                     b.ToTable("AspNetUsers");
                 });
@@ -125,7 +128,7 @@ namespace Connect4.Data.Migrations
 
                     b.HasIndex("TorneioId");
 
-                    b.ToTable("Jogo");
+                    b.ToTable("Jogos");
                 });
 
             modelBuilder.Entity("Connect4.Models.Tabuleiro", b =>
@@ -139,7 +142,7 @@ namespace Connect4.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Tabuleiro");
+                    b.ToTable("Tabuleiros");
                 });
 
             modelBuilder.Entity("Connect4.Models.Torneio", b =>
@@ -295,9 +298,9 @@ namespace Connect4.Data.Migrations
 
             modelBuilder.Entity("Connect4.Models.ApplicationUser", b =>
                 {
-                    b.HasOne("Connect4.Models.JogadorPessoa", "jogador")
-                        .WithMany()
-                        .HasForeignKey("jogadorId");
+                    b.HasOne("Connect4.Models.JogadorPessoa", "Jogador")
+                        .WithOne("Usuario")
+                        .HasForeignKey("Connect4.Models.ApplicationUser", "JogadorId");
                 });
 
             modelBuilder.Entity("Connect4.Models.Jogador", b =>

@@ -9,11 +9,11 @@ using Microsoft.EntityFrameworkCore.Storage.Internal;
 using Microsoft.EntityFrameworkCore.ValueGeneration;
 using System;
 
-namespace Connect4.Data.Migrations
+namespace Connect4.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20191114003406_Aula1311")]
-    partial class Aula1311
+    [Migration("20191122213918_Inicial")]
+    partial class Inicial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -68,7 +68,9 @@ namespace Connect4.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("JogadorId");
+                    b.HasIndex("JogadorId")
+                        .IsUnique()
+                        .HasFilter("[JogadorId] IS NOT NULL");
 
                     b.HasIndex("NormalizedEmail")
                         .HasName("EmailIndex");
@@ -298,8 +300,8 @@ namespace Connect4.Data.Migrations
             modelBuilder.Entity("Connect4.Models.ApplicationUser", b =>
                 {
                     b.HasOne("Connect4.Models.JogadorPessoa", "Jogador")
-                        .WithMany()
-                        .HasForeignKey("JogadorId");
+                        .WithOne("Usuario")
+                        .HasForeignKey("Connect4.Models.ApplicationUser", "JogadorId");
                 });
 
             modelBuilder.Entity("Connect4.Models.Jogador", b =>
