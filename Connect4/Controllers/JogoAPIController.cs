@@ -107,8 +107,16 @@ namespace Connect4.Controllers
             //Verificar se ele é o jogador 1 ou 2.
             //Verificar se ele pode fazer a jogada.
             //Por último executar a jogada ou exceção.
-            jogo.Tabuleiro.Jogar(jogo.Tabuleiro.Turno, Pos);
-            _context.SaveChanges();
+            ApplicationUser applicationUser = _userManager.GetUserAsync (User).Result;
+            if ((applicationUser.JogadorId == jogo.Jogador1Id && jogo.Tabuleiro.Turno == 1) || (applicationUser.JogadorId == jogo.Jogador2Id && jogo.Tabuleiro.Turno == 2))
+            {
+                jogo.Tabuleiro.Jogar (jogo.Tabuleiro.Turno, Pos);
+                _context.SaveChanges ();
+            }
+            else
+            {
+                throw new ApplicationException ("Não é a sua vez de jogar");
+            }
             return Ok(jogo.Tabuleiro);
         }
     }
