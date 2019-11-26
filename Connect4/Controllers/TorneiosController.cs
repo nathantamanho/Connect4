@@ -48,6 +48,8 @@ namespace Connect4.Controllers
         // GET: Torneios/Create
         public IActionResult Create()
         {
+            JogadorPessoa[] jp = _context.JogadorPessoas.Include (j => j.Usuario).ToArray ();
+            ViewBag.Jogadores = new MultiSelectList (jp, "Id", "Nome");
             return View();
         }
 

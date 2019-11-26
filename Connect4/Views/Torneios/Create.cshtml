@@ -9,34 +9,37 @@
 <h4>Torneio</h4>
 <hr />
 <div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="NomeTorneio" class="control-label"></label>
-                <input asp-for="NomeTorneio" class="form-control" />
-                <span asp-validation-for="NomeTorneio" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="QuantidadeJogadores" class="control-label"></label>
-                <input asp-for="QuantidadeJogadores" class="form-control" />
-                <span asp-validation-for="QuantidadeJogadores" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Premiacao" class="control-label"></label>
-                <input asp-for="Premiacao" class="form-control" />
-                <span asp-validation-for="Premiacao" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Inicio" class="control-label"></label>
-                <input asp-for="Inicio" class="form-control" />
-                <span asp-validation-for="Inicio" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-default" />
-            </div>
-        </form>
-    </div>
+    <form asp-action="Create">
+        <div class="col-md-4">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <div class="form-group">
+                    <label asp-for="NomeTorneio" class="control-label"></label>
+                    <input asp-for="NomeTorneio" class="form-control" />
+                    <span asp-validation-for="NomeTorneio" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="QuantidadeJogadores" class="control-label"></label>
+                    <input asp-for="QuantidadeJogadores" class="form-control" />
+                    <span asp-validation-for="QuantidadeJogadores" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Premiacao" class="control-label"></label>
+                    <input asp-for="Premiacao" class="form-control" />
+                    <span asp-validation-for="Premiacao" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Inicio" class="control-label"></label>
+                    <input asp-for="Inicio" class="form-control" />
+                    <span asp-validation-for="Inicio" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <input type="submit" value="Create" class="btn btn-default" />
+                </div>
+        </div>
+        <div class="col-md-4">
+            <select asp-items="@ViewBag.Jogadores" name="Jogadores" multiple></select>
+        </div>
+    </form>
 </div>
 
 <div>

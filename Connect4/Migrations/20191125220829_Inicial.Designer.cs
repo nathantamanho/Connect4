@@ -12,7 +12,7 @@ using System;
 namespace Connect4.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20191122213918_Inicial")]
+    [Migration("20191125220829_Inicial")]
     partial class Inicial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
