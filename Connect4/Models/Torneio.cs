@@ -10,7 +10,7 @@ namespace Connect4.Models
     {
         public int Id { get; set; }
 
-        public IList<Jogador> Jogadores { get; set; }
+        public IList<Jogador> Jogadores { get; set; } = new List<Jogador> ();
 
         public IList<Jogo> Jogos { get; set; }
 

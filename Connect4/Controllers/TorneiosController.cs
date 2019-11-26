@@ -204,5 +204,55 @@ namespace Connect4.Controllers
         {
             return _context.Torneio.Any(e => e.Id == id);
         }
+
+
+        public IActionResult SelecionarJogadores (int id)
+        {
+            var torneio = _context.Torneio.Include (t => t.Jogadores)
+                .SingleOrDefault (m => m.Id == id);
+            if (torneio == null)
+            {
+                return NotFound ();
+            }
+
+            SelecionarUsuarioViewModel viewModel = new SelecionarUsuarioViewModel ();
+
+            List<int> jogadores = new List<int> ();
+            if (torneio.Jogadores != null)
+            {
+                jogadores = torneio.Jogadores.Select (j => j.Id).ToList ();
+            }
+            ViewBag.Jogadores =
+                new SelectList (_context.JogadorPessoas.Include (j => j.Usuario).ToList (),
+                nameof (JogadorPessoa.Id),
+                nameof (JogadorPessoa.Nome),
+                jogadores
+                );
+            viewModel.JogadoresIds = jogadores;
+            return View (viewModel);
+        }
+
+
+        [HttpPost]
+        public IActionResult SelecionarJogadores (
+            int id,
+            [Bind (nameof (SelecionarUsuarioViewModel.JogadoresIds))] SelecionarUsuarioViewModel viewModel)
+        {
+            var torneio = _context.Torneio.SingleOrDefault (m => m.Id == id);
+            if (torneio == null)
+            {
+                return NotFound ();
+            }
+
+            var jogadores = _context.JogadorPessoas.Where (
+                jp => viewModel.JogadoresIds.Exists (j => j == jp.Id))
+                .ToList ();
+            foreach (var item in jogadores)
+            {
+                torneio.Jogadores.Add (item);
+            }
+            _context.SaveChanges ();
+            return View (viewModel);
+        }
     }
 }

@@ -9,6 +9,10 @@
     <Content Remove="wwwroot\Tabuleiro.html" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Include="Views\Torneios\SelecionarJogadores.cshtml" />
+  </ItemGroup>
+
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.All" Version="2.0.9" />
