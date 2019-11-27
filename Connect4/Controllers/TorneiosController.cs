@@ -23,7 +23,8 @@ namespace Connect4.Controllers
         // GET: Torneios
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Torneio.ToListAsync());
+            var resultado = await _context.Torneio.Include (t => t.Jogadores).ToListAsync ();
+            return View(resultado);
         }
 
         // GET: Torneios/Details/5
@@ -67,46 +68,6 @@ namespace Connect4.Controllers
                 _context.Add (torneio);
                 torneio.Jogadores = new List<Jogador> ();
                 torneio.Jogos = new List<Jogo> ();
-                //
-                // CRIANDO JOGADORES
-                //
-                // NÃO SEI COMO LINKAR JOGADORES JÁ CADASTRADOS...PERGUNTAR PARA O PROFESSOR
-                List<Jogador> jogadores = new List<Jogador> ();
-                for (int i = 1; i <= torneio.QuantidadeJogadores; i++)
-                {
-                    JogadorPessoa jogadorPessoa = new JogadorPessoa ();
-                    jogadores.Add (jogadorPessoa);
-                    torneio.Jogadores.Add (jogadorPessoa);
-                    _context.JogadorPessoas.Add (jogadorPessoa);
-                }
-                _context.SaveChanges ();
-                //
-                // CRIANDO JOGOS
-                //
-                for (int i = 1; i <= 2; i++)
-                {
-                    List<Jogo> jogos = new List<Jogo> ();
-                    for (int j1 = 0; j1 < jogadores.Count - 1; j1++)
-                    {
-                        for (int j2 = j1 + 1; j2 < jogadores.Count; j2++)
-                        {
-                            Jogo jogo = new Jogo ()
-                            {
-                                Jogador1 = jogadores[j1],
-                                Jogador2 = jogadores[j2],
-                                Tabuleiro = new Tabuleiro ()
-                            };
-                            jogos.Add (jogo);
-                        }
-                    }
-                    Random random = new Random ();
-                    while (jogos.Count > 0)
-                    {
-                        int valorAleatorio = random.Next (jogos.Count);
-                        torneio.Jogos.Add (jogos[valorAleatorio]);
-                        jogos.RemoveAt (valorAleatorio);
-                    }
-                }
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
@@ -229,6 +190,7 @@ namespace Connect4.Controllers
                 jogadores
                 );
             viewModel.JogadoresIds = jogadores;
+            viewModel.QuantidadeJogadores = torneio.QuantidadeJogadores;
             return View (viewModel);
         }
 
@@ -238,21 +200,53 @@ namespace Connect4.Controllers
             int id,
             [Bind (nameof (SelecionarUsuarioViewModel.JogadoresIds))] SelecionarUsuarioViewModel viewModel)
         {
-            var torneio = _context.Torneio.SingleOrDefault (m => m.Id == id);
+            var torneio = _context.Torneio.Include (t => t.Jogos).SingleOrDefault (m => m.Id == id);
             if (torneio == null)
             {
                 return NotFound ();
             }
-
-            var jogadores = _context.JogadorPessoas.Where (
-                jp => viewModel.JogadoresIds.Exists (j => j == jp.Id))
-                .ToList ();
-            foreach (var item in jogadores)
+            if (viewModel.JogadoresIds.Count == torneio.QuantidadeJogadores)
             {
-                torneio.Jogadores.Add (item);
+
+                var jogadores = _context.JogadorPessoas.Where (
+                    jp => viewModel.JogadoresIds.Exists (j => j == jp.Id))
+                    .ToList ();
+                foreach (var item in jogadores)
+                {
+                    torneio.Jogadores.Add (item);
+                }
+                _context.SaveChanges ();
+                //
+                // CRIANDO JOGOS
+                //
+                for (int i = 1; i <= 2; i++)
+                {
+                    List<Jogo> jogos = new List<Jogo> ();
+                    for (int j1 = 0; j1 < jogadores.Count - 1; j1++)
+                    {
+                        for (int j2 = j1 + 1; j2 < jogadores.Count; j2++)
+                        {
+                            Jogo jogo = new Jogo ()
+                            {
+                                Jogador1 = jogadores[j1],
+                                Jogador2 = jogadores[j2],
+                                Tabuleiro = new Tabuleiro ()
+                            };
+                            jogos.Add (jogo);
+                        }
+                    }
+                    Random random = new Random ();
+                    while (jogos.Count > 0)
+                    {
+                        int valorAleatorio = random.Next (jogos.Count);
+                        torneio.Jogos.Add (jogos[valorAleatorio]);
+                        jogos.RemoveAt (valorAleatorio);
+                    }
+                }
             }
             _context.SaveChanges ();
-            return View (viewModel);
+            return RedirectToAction (nameof (Index));
+            //return View (viewModel);
         }
     }
 }

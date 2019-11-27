@@ -8,5 +8,6 @@ namespace Connect4.Models
     public class SelecionarUsuarioViewModel
     {
         public List<int> JogadoresIds { get; set; }
+        public int QuantidadeJogadores { get; set; }
     }
 }
