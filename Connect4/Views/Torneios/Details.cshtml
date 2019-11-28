@@ -1,4 +1,4 @@
-﻿@model Connect4.Models.Torneio
+﻿@model Connect4.Models.DetalhesTorneioViewModel
 
 
 @inject SignInManager<ApplicationUser> SignInManager
@@ -14,34 +14,72 @@
 <div>
     <h4>Torneio</h4>
     <hr />
-    <dl class="dl-horizontal">
-        <dt>
-            @Html.DisplayNameFor(model => model.NomeTorneio)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.NomeTorneio)
-        </dd>
-        @if (SignInManager.IsSignedIn(User))
-        {
-        <dt>
-            @Html.DisplayNameFor(model => model.QuantidadeJogadores)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.QuantidadeJogadores)
-        </dd>
-        @if (Model.Dono == User.Identity.Name)
-        {
-        <dt>
-            @Html.DisplayNameFor(model => model.Inicio)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.Inicio)
-        </dd>
-        }
-        }
-    </dl>
+    <div class="row">
+        <div class="col-md-4">
+            <dl class="dl-horizontal">
+                <dt>
+                    @Html.DisplayNameFor(model => model.Torneio.NomeTorneio)
+                </dt>
+                <dd>
+                    @Html.DisplayFor(model => model.Torneio.NomeTorneio)
+                </dd>
+                @if (SignInManager.IsSignedIn(User))
+                {
+                <dt>
+                    @Html.DisplayNameFor(model => model.Torneio.QuantidadeJogadores)
+                </dt>
+                <dd>
+                    @Html.DisplayFor(model => model.Torneio.QuantidadeJogadores)
+                </dd>
+                @if (Model.Torneio.Dono == User.Identity.Name)
+                {
+                <dt>
+                    @Html.DisplayNameFor(model => model.Torneio.Inicio)
+                </dt>
+                <dd>
+                    @Html.DisplayFor(model => model.Torneio.Inicio)
+                </dd>
+                }
+                }
+            </dl>
+        </div>
+        <div class="col-md-4">
+            @if (Model.ProximoJogo != null)
+            { 
+                <span>JOGOS CONCLUÍDOS: @Model.JogosConcluidos / @Model.Torneio.Jogos.Count</span>
+                <br />
+                <span>PROXIMO JOGO: @Model.ProximoJogo.Jogador1.Nome VS @Model.ProximoJogo.Jogador2.Nome</span>
+                <br />
+                <a asp-controller="Jogo" asp-action="Lobby" asp-route-id="@Model.ProximoJogo.Id">INICIAR JOGO</a>
+            }
+        </div>
+        <div class="col-md-4">
+            <h1>RANKING</h1>
+            <table cellpadding="10" border="1">
+                <thead>
+                    <th>
+                        NOME
+                    </th>
+                    <th>
+                        PONTUAÇÃO
+                    </th>
+                </thead>
+                @foreach (Ranking r in Model.Ranking)
+                {
+                <tr>
+                    <td>
+                        @r.Jogador.Nome
+                    </td>
+                    <td align="center">
+                        @r.Pontuacao
+                    </td>
+                </tr>
+                }
+            </table>
+            </div>
+    </div>
 </div>
 <div>
-    <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> |
+    <a asp-action="Edit" asp-route-id="@Model.Torneio.Id">Edit</a> |
     <a asp-action="Index">Back to List</a>
 </div>

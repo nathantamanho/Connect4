@@ -34,15 +34,82 @@ namespace Connect4.Controllers
             {
                 return NotFound();
             }
-
-            var torneio = await _context.Torneio
-                .SingleOrDefaultAsync(m => m.Id == id);
-            if (torneio == null)
+            DetalhesTorneioViewModel viewModel = new DetalhesTorneioViewModel ();
+            viewModel.Torneio = await _context.Torneio.Include(t => t.Jogos).SingleOrDefaultAsync (t => t.Id == id);
+            if (viewModel.Torneio == null)
             {
                 return NotFound();
             }
-
-            return View(torneio);
+            viewModel.JogosConcluidos = 0;
+            for (int i = 0; i < viewModel.Torneio.Jogos.Count; i++)// Jogo j in viewModel.Jogos)
+            {
+                viewModel.Torneio.Jogos[i] = 
+                    _context.Jogos
+                    .Include (j => j.Jogador1)
+                    .Include (j => j.Jogador2)
+                    .Include (j => j.Tabuleiro)
+                    .Where (j => j.TabuleiroId == viewModel.Torneio.Jogos[i].TabuleiroId)
+                    .FirstOrDefault ();
+                if (viewModel.Torneio.Jogos[i].Tabuleiro.Vencedor () != 0)
+                {
+                    viewModel.JogosConcluidos++;
+                }
+                else
+                {
+                    if (viewModel.ProximoJogo == null)
+                    {
+                        viewModel.ProximoJogo = viewModel.Torneio.Jogos[i];
+                    }
+                }
+            }
+            for (int i = 0; i < viewModel.Torneio.Jogadores.Count; i++)
+            {
+                if (viewModel.Torneio.Jogadores[i] is JogadorPessoa)
+                {
+                    viewModel.Torneio.Jogadores[i] = _context.JogadorPessoas
+                                    .Include (j => j.Usuario)
+                                    .Where (j => j.Id == viewModel.Torneio.Jogadores[i].Id)
+                                    .FirstOrDefault ();
+                }
+            }
+            if (viewModel.ProximoJogo != null)
+            {
+                if (viewModel.ProximoJogo.Jogador1 is JogadorPessoa)
+                {
+                    viewModel.ProximoJogo.Jogador1 = _context.JogadorPessoas
+                                    .Include (j => j.Usuario)
+                                    .Where (j => j.Id == viewModel.ProximoJogo.Jogador1Id)
+                                    .FirstOrDefault ();
+                }
+                if (viewModel.ProximoJogo.Jogador2 is JogadorPessoa)
+                {
+                    viewModel.ProximoJogo.Jogador2 = _context.JogadorPessoas
+                                    .Include (j => j.Usuario)
+                                    .Where (j => j.Id == viewModel.ProximoJogo.Jogador2Id)
+                                    .FirstOrDefault ();
+                }
+            }
+            viewModel.Ranking = new List<Ranking> ();
+            foreach (Jogador jogador in viewModel.Torneio.Jogadores)
+            {
+                Ranking ranking = new Ranking ();
+                ranking.Jogador = jogador;
+                ranking.Pontuacao = 0;
+                foreach (Jogo jogo in viewModel.Torneio.Jogos.Where (j => j.Jogador1Id == jogador.Id || j.Jogador2Id == jogador.Id))
+                {
+                    if (jogo.Tabuleiro.Vencedor () == -1)
+                    {
+                        ranking.Pontuacao++;
+                    }
+                    else if ((jogador.Id == jogo.Jogador1Id && jogo.Tabuleiro.Vencedor () == 1) || (jogador.Id == jogo.Jogador2Id && jogo.Tabuleiro.Vencedor () == 2))
+                    {
+                        ranking.Pontuacao += 3;
+                    }
+                }
+                viewModel.Ranking.Add (ranking);
+            }
+            viewModel.Ranking = viewModel.Ranking.OrderByDescending (r => r.Pontuacao).ToList ();
+            return View(viewModel);
         }
 
         [Authorize]

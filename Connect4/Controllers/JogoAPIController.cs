@@ -103,14 +103,6 @@ namespace Connect4.Controllers
             {
                 return BadRequest();
             }
-            if (jogo.Tabuleiro.Vencedor () != 0)
-            {
-                throw new ApplicationException ("O jogo já acabou");
-            }
-            //TODO: Pegar o usuário autenticado. 
-            //Verificar se ele é o jogador 1 ou 2.
-            //Verificar se ele pode fazer a jogada.
-            //Por último executar a jogada ou exceção.
             ApplicationUser applicationUser = _userManager.GetUserAsync (User).Result;
             if ((applicationUser.JogadorId == jogo.Jogador1Id && jogo.Tabuleiro.Turno == 1) || (applicationUser.JogadorId == jogo.Jogador2Id && jogo.Tabuleiro.Turno == 2))
             {
